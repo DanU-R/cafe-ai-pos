@@ -132,4 +132,20 @@ test('cashier can complete POS checkout from browser UI and data is stored in da
     expect(order.change_amount).toBe('33000.00');
     expect(order.items_count).toBe(2);
     expect(order.product_names).toEqual(expect.arrayContaining([firstProductName, secondProductName]));
+
+    await visit(page, '/orders');
+    await expect(page.getByRole('heading', { name: 'Riwayat Transaksi' })).toBeVisible();
+    await expect(page.getByText(order.order_code ?? '')).toBeVisible();
+    await expect(page.getByText('Rp 27.000')).toBeVisible();
+    await expect(page.getByText('Rp 60.000')).toBeVisible();
+    await expect(page.getByText('Rp 33.000')).toBeVisible();
+
+    await page.locator('[data-slot="card"]').filter({ hasText: order.order_code ?? '' }).getByRole('link', { name: 'Detail' }).click();
+    await expect(page.getByRole('heading', { name: 'Detail Order' })).toBeVisible();
+    await expect(page.getByText(order.order_code ?? '', { exact: true })).toBeVisible();
+    await expect(page.getByText(firstProductName)).toBeVisible();
+    await expect(page.getByText(secondProductName)).toBeVisible();
+    await expect(page.getByText('Rp 27.000')).toBeVisible();
+    await expect(page.getByText('Rp 60.000')).toBeVisible();
+    await expect(page.getByText('Rp 33.000')).toBeVisible();
 });

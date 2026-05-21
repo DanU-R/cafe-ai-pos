@@ -4,6 +4,7 @@ import {
     FolderGit2,
     LayoutGrid,
     Package,
+    ReceiptText,
     ShoppingCart,
     Sparkles,
     Tags,
@@ -34,6 +35,11 @@ const mainNavItems: NavItem[] = [
         title: 'Kasir/POS',
         href: '/pos',
         icon: ShoppingCart,
+    },
+    {
+        title: 'Riwayat Transaksi',
+        href: '/orders',
+        icon: ReceiptText,
     },
     {
         title: 'Kategori',

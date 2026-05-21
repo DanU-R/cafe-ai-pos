@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Product extends Model
+class Order extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -14,25 +14,27 @@ class Product extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'category_id',
-        'name',
-        'description',
-        'price',
-        'is_active',
+        'user_id',
+        'order_code',
+        'total',
+        'paid_amount',
+        'change_amount',
+        'payment_method',
+        'status',
     ];
 
     /**
-     * Get the category that owns the product.
+     * Get the user that owns the order.
      */
-    public function category(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
-     * Get the order items for the product.
+     * Get the items for the order.
      */
-    public function orderItems(): HasMany
+    public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
@@ -45,8 +47,9 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:2',
-            'is_active' => 'boolean',
+            'total' => 'decimal:2',
+            'paid_amount' => 'decimal:2',
+            'change_amount' => 'decimal:2',
         ];
     }
 }

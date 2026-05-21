@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -58,11 +58,47 @@ function formatDate(value: string | null): string {
 }
 
 export default function OrderShow({ order }: Props) {
+    function printReceipt(): void {
+        window.print();
+    }
+
     return (
         <>
-            <Head title={`Detail ${order.order_code}`} />
+            <Head title={`Detail ${order.order_code}`}>
+                <style>{`
+                    @media print {
+                        @page {
+                            size: 80mm auto;
+                            margin: 6mm;
+                        }
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+                        body * {
+                            visibility: hidden;
+                        }
+
+                        .receipt-print-area,
+                        .receipt-print-area * {
+                            visibility: visible;
+                        }
+
+                        .receipt-print-area {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 72mm;
+                            margin: 0;
+                            padding: 0;
+                            border: 0 !important;
+                            background: white !important;
+                            box-shadow: none !important;
+                            color: black !important;
+                            font-size: 11px;
+                        }
+                    }
+                `}</style>
+            </Head>
+
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 print:block print:overflow-visible print:p-0">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
@@ -72,12 +108,26 @@ export default function OrderShow({ order }: Props) {
                             Ringkasan transaksi {order.order_code}.
                         </p>
                     </div>
-                    <Button variant="outline" asChild className="w-full sm:w-fit">
-                        <Link href="/orders">
-                            <ArrowLeft className="size-4" />
-                            Kembali ke riwayat transaksi
-                        </Link>
-                    </Button>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <Button
+                            type="button"
+                            onClick={printReceipt}
+                            className="w-full sm:w-fit"
+                        >
+                            <Printer className="size-4" />
+                            Cetak Struk
+                        </Button>
+                        <Button
+                            variant="outline"
+                            asChild
+                            className="w-full sm:w-fit"
+                        >
+                            <Link href="/orders">
+                                <ArrowLeft className="size-4" />
+                                Kembali ke riwayat transaksi
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -120,27 +170,70 @@ export default function OrderShow({ order }: Props) {
                         </CardContent>
                     </Card>
 
-                    <Card className="h-fit">
-                        <CardHeader>
-                            <CardTitle>{order.order_code}</CardTitle>
-                            <CardDescription>
-                                {formatDate(order.created_at)}
+                    <Card className="receipt-print-area h-fit">
+                        <CardHeader className="text-center print:gap-1 print:p-0 print:pb-3">
+                            <CardTitle className="print:text-base">
+                                AI POS Cafe
+                            </CardTitle>
+                            <CardDescription className="print:text-[11px] print:text-black">
+                                Struk pembayaran
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="grid gap-4">
-                            <div className="grid gap-1">
-                                <div className="text-sm text-muted-foreground">Kasir</div>
-                                <div className="font-medium">{order.user?.name ?? '-'}</div>
+                        <CardContent
+                            data-testid="print-receipt"
+                            className="grid gap-4 print:gap-2 print:p-0 print:text-black"
+                        >
+                            <div className="grid gap-1 border-b pb-3 text-sm print:gap-0.5 print:border-black print:pb-2 print:text-[11px]">
+                                <div className="flex justify-between gap-3">
+                                    <span>Kode</span>
+                                    <span className="font-medium">{order.order_code}</span>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <span>Tanggal</span>
+                                    <span>{formatDate(order.created_at)}</span>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <span>Kasir</span>
+                                    <span>{order.user?.name ?? '-'}</span>
+                                </div>
                             </div>
-                            <div className="flex items-center justify-between gap-3">
-                                <span className="text-sm text-muted-foreground">Payment method</span>
-                                <Badge variant="secondary">{order.payment_method}</Badge>
+                            <div className="grid gap-2 border-b pb-3 print:gap-1 print:border-black print:pb-2">
+                                {order.items.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="grid gap-1 text-sm print:text-[11px]"
+                                    >
+                                        <div className="font-medium">
+                                            {item.product_name}
+                                        </div>
+                                        <div className="flex justify-between gap-3 text-muted-foreground print:text-black">
+                                            <span>
+                                                {formatCurrency(item.price)} x {item.qty}
+                                            </span>
+                                            <span>
+                                                {formatCurrency(item.subtotal)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="flex items-center justify-between gap-3">
-                                <span className="text-sm text-muted-foreground">Status</span>
-                                <Badge>{order.status}</Badge>
+
+                            <div className="grid gap-2 text-sm print:gap-1 print:text-[11px]">
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="text-muted-foreground print:text-black">
+                                        Payment method
+                                    </span>
+                                    <Badge variant="secondary">{order.payment_method}</Badge>
+                                </div>
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="text-muted-foreground print:text-black">
+                                        Status
+                                    </span>
+                                    <Badge>{order.status}</Badge>
+                                </div>
                             </div>
-                            <div className="border-t pt-4">
+
+                            <div className="border-t pt-4 print:border-black print:pt-2">
                                 <div className="flex items-center justify-between gap-3">
                                     <span>Total</span>
                                     <span className="font-semibold">{formatCurrency(order.total)}</span>
@@ -154,6 +247,10 @@ export default function OrderShow({ order }: Props) {
                                     <span>{formatCurrency(order.change_amount)}</span>
                                 </div>
                             </div>
+
+                            <p className="border-t pt-4 text-center text-sm text-muted-foreground print:border-black print:pt-2 print:text-[11px] print:text-black">
+                                Terima kasih
+                            </p>
                         </CardContent>
                     </Card>
                 </div>

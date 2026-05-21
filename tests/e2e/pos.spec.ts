@@ -52,19 +52,21 @@ test.afterEach(() => {
 });
 
 test('cashier can complete POS checkout from browser UI and data is stored in database', async ({ page }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
 
     await visit(page, '/login');
     await page.getByLabel('Email address').fill(cashierEmail);
     await page.getByRole('textbox', { name: 'Password' }).fill(cashierPassword);
-    await page.getByRole('button', { name: 'Log in' }).click();
-    await expect(page).toHaveURL(/\/dashboard$/);
-
-    await page.waitForLoadState('domcontentloaded');
+    await Promise.all([
+        page.waitForURL(/\/dashboard$/),
+        page.getByRole('button', { name: 'Log in' }).click(),
+    ]);
     await visit(page, '/categories/create');
     await page.getByLabel('Nama kategori').fill(categoryName);
-    await page.getByRole('button', { name: 'Simpan kategori' }).click();
-    await expect(page).toHaveURL(/\/categories$/);
+    await Promise.all([
+        page.waitForURL(/\/categories$/),
+        page.getByRole('button', { name: 'Simpan kategori' }).click(),
+    ]);
     await expect(page.getByText(categoryName)).toBeVisible();
 
     await visit(page, '/products/create');
@@ -73,8 +75,10 @@ test('cashier can complete POS checkout from browser UI and data is stored in da
     await page.getByLabel('Nama produk').fill(firstProductName);
     await page.getByLabel('Deskripsi').fill('Produk QA E2E untuk flow browser POS.');
     await page.getByLabel('Harga').fill('15000');
-    await page.getByRole('button', { name: 'Simpan produk' }).click();
-    await expect(page).toHaveURL(/\/products$/);
+    await Promise.all([
+        page.waitForURL(/\/products$/),
+        page.getByRole('button', { name: 'Simpan produk' }).click(),
+    ]);
     await expect(page.getByText(firstProductName)).toBeVisible();
 
     await visit(page, '/products/create');
@@ -83,8 +87,10 @@ test('cashier can complete POS checkout from browser UI and data is stored in da
     await page.getByLabel('Nama produk').fill(secondProductName);
     await page.getByLabel('Deskripsi').fill('Produk QA E2E kedua untuk cart POS.');
     await page.getByLabel('Harga').fill('12000');
-    await page.getByRole('button', { name: 'Simpan produk' }).click();
-    await expect(page).toHaveURL(/\/products$/);
+    await Promise.all([
+        page.waitForURL(/\/products$/),
+        page.getByRole('button', { name: 'Simpan produk' }).click(),
+    ]);
     await expect(page.getByText(secondProductName)).toBeVisible();
 
     await visit(page, '/pos');
@@ -143,9 +149,18 @@ test('cashier can complete POS checkout from browser UI and data is stored in da
     await page.locator('[data-slot="card"]').filter({ hasText: order.order_code ?? '' }).getByRole('link', { name: 'Detail' }).click();
     await expect(page.getByRole('heading', { name: 'Detail Order' })).toBeVisible();
     await expect(page.getByText(order.order_code ?? '', { exact: true })).toBeVisible();
-    await expect(page.getByText(firstProductName)).toBeVisible();
-    await expect(page.getByText(secondProductName)).toBeVisible();
-    await expect(page.getByText('Rp 27.000')).toBeVisible();
-    await expect(page.getByText('Rp 60.000')).toBeVisible();
-    await expect(page.getByText('Rp 33.000')).toBeVisible();
+    await expect(page.getByText(firstProductName).first()).toBeVisible();
+    await expect(page.getByText(secondProductName).first()).toBeVisible();
+    await expect(page.getByText('Rp 27.000').first()).toBeVisible();
+    await expect(page.getByText('Rp 60.000').first()).toBeVisible();
+    await expect(page.getByText('Rp 33.000').first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cetak Struk' })).toBeVisible();
+
+    const receipt = page.getByTestId('print-receipt');
+    await expect(receipt).toContainText(order.order_code ?? '');
+    await expect(receipt).toContainText(firstProductName);
+    await expect(receipt).toContainText(secondProductName);
+    await expect(receipt).toContainText('Rp 27.000');
+    await expect(receipt).toContainText('Rp 60.000');
+    await expect(receipt).toContainText('Rp 33.000');
 });

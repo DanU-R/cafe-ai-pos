@@ -4,6 +4,7 @@ import {
     FolderGit2,
     LayoutGrid,
     Package,
+    ShoppingCart,
     Sparkles,
     Tags,
 } from 'lucide-react';
@@ -28,6 +29,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Kasir/POS',
+        href: '/pos',
+        icon: ShoppingCart,
     },
     {
         title: 'Kategori',

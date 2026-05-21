@@ -108,9 +108,14 @@ test('cashier can complete POS checkout from browser UI and data is stored in da
     await expect(page.getByText('Rp 27.000')).toBeVisible();
     await page.getByLabel('Uang bayar').fill('60000');
     await expect(page.getByText('Rp 33.000')).toBeVisible();
-    await page.getByRole('button', { name: 'Checkout' }).click();
+    await Promise.all([
+        page.waitForResponse((response) =>
+            response.url().includes('/pos/checkout') && response.request().method() === 'POST',
+        ),
+        page.getByRole('button', { name: 'Checkout' }).click(),
+    ]);
 
-    await expect(page.getByText('Checkout berhasil')).toBeVisible();
+    await expect(page.getByText('Checkout berhasil')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/Order berhasil disimpan dengan kode POS-\d{8}-\d{4}\./)).toBeVisible();
     await expect(page.getByText('Cart masih kosong')).toBeVisible();
 
@@ -138,6 +143,16 @@ test('cashier can complete POS checkout from browser UI and data is stored in da
     expect(order.change_amount).toBe('33000.00');
     expect(order.items_count).toBe(2);
     expect(order.product_names).toEqual(expect.arrayContaining([firstProductName, secondProductName]));
+
+    await visit(page, '/dashboard');
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(page.getByText('Omzet')).toBeVisible();
+    await expect(page.getByText('Jumlah transaksi')).toBeVisible();
+    await expect(page.getByText('Rp 27.000').first()).toBeVisible();
+    await expect(page.getByText('1').first()).toBeVisible();
+    await expect(page.getByText(order.order_code ?? '')).toBeVisible();
+    await expect(page.getByText(firstProductName)).toBeVisible();
+    await expect(page.getByText(secondProductName)).toBeVisible();
 
     await visit(page, '/orders');
     await expect(page.getByRole('heading', { name: 'Riwayat Transaksi' })).toBeVisible();

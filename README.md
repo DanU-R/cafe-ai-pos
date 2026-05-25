@@ -416,6 +416,4 @@ This project is open-sourced under the **MIT License**.
 
 ## Attribution
 
-Created by **Danu Ranggana** — **Lulusan S1 Teknik Informatika Institut Widya Pratama dengan Predikat Pujian**.
-
 The Dynamic QRIS implementation concept is inspired by [`DanU-R/qris_tools`](https://github.com/DanU-R/qris_tools), then adapted into this Laravel/Inertia POS system with database-backed settings, browser-based QR decoding, checkout amount injection, and CRC regeneration.

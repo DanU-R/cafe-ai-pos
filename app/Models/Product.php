@@ -18,6 +18,9 @@ class Product extends Model
         'name',
         'description',
         'price',
+        'cost_price',
+        'stock',
+        'minimum_stock',
         'is_active',
     ];
 
@@ -38,6 +41,32 @@ class Product extends Model
     }
 
     /**
+     * Get the stock movements for the product.
+     */
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
+    /**
+     * Get the purchase items for the product.
+     */
+    public function purchaseItems(): HasMany
+    {
+        return $this->hasMany(PurchaseItem::class);
+    }
+
+    public function recipes(): HasMany
+    {
+        return $this->hasMany(ProductRecipe::class);
+    }
+
+    public function modifiers(): HasMany
+    {
+        return $this->hasMany(ProductModifier::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -46,6 +75,9 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
+            'cost_price' => 'decimal:2',
+            'stock' => 'integer',
+            'minimum_stock' => 'integer',
             'is_active' => 'boolean',
         ];
     }

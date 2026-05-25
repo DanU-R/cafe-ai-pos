@@ -1,16 +1,18 @@
 <?php
 
 use App\Ai\Agents\MenuDescriptionAgent;
-use Illuminate\Auth\Middleware\Authenticate;
+use App\Models\User;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Tests\TestCase;
 
-uses(TestCase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 it('displays the menu description generator page', function () {
-    $this->withoutMiddleware([Authenticate::class, EnsureEmailIsVerified::class])
+    $this->withoutMiddleware([EnsureEmailIsVerified::class])
+        ->actingAs(User::factory()->create(['role' => 'admin']))
         ->get(route('menu-description.edit'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -29,7 +31,8 @@ it('generates a menu description using the agent', function () {
         return 'Es kopi susu aren yang lembut dengan paduan espresso, susu segar, dan manis legit gula aren.';
     })->preventStrayPrompts();
 
-    $response = $this->withoutMiddleware([Authenticate::class, EnsureEmailIsVerified::class])
+    $response = $this->withoutMiddleware([EnsureEmailIsVerified::class])
+        ->actingAs(User::factory()->create(['role' => 'admin']))
         ->post(route('menu-description.store'), [
             'name' => 'Es Kopi Susu Aren',
             'ingredients' => 'espresso, susu segar, gula aren',
@@ -49,7 +52,8 @@ it('returns a safe fallback message when generation fails', function () {
         throw new RuntimeException('Provider unavailable.');
     })->preventStrayPrompts();
 
-    $response = $this->withoutMiddleware([Authenticate::class, EnsureEmailIsVerified::class])
+    $response = $this->withoutMiddleware([EnsureEmailIsVerified::class])
+        ->actingAs(User::factory()->create(['role' => 'admin']))
         ->post(route('menu-description.store'), [
             'name' => 'Matcha Latte',
             'ingredients' => 'matcha, susu segar, gula aren',
@@ -67,7 +71,8 @@ it('returns a safe fallback message when generation fails', function () {
 it('validates menu description input', function () {
     MenuDescriptionAgent::fake()->preventStrayPrompts();
 
-    $this->withoutMiddleware([Authenticate::class, EnsureEmailIsVerified::class])
+    $this->withoutMiddleware([EnsureEmailIsVerified::class])
+        ->actingAs(User::factory()->create(['role' => 'admin']))
         ->post(route('menu-description.store'), [
             'name' => '',
             'ingredients' => '',

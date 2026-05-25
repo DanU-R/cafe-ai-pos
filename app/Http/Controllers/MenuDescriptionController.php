@@ -35,10 +35,14 @@ class MenuDescriptionController extends Controller
         ]);
 
         try {
-            $response = (new MenuDescriptionAgent)->prompt(
-                $this->prompt($validated),
-                model: 'cx/gpt-5.5',
-            );
+            if (app()->environment('e2e')) {
+                $response = "{$validated['name']} dibuat dari {$validated['ingredients']} dengan karakter rasa {$validated['tone']} yang cocok untuk menu kafe.";
+            } else {
+                $response = (new MenuDescriptionAgent)->prompt(
+                    $this->prompt($validated),
+                    model: 'cx/gpt-5.5',
+                );
+            }
 
             return to_route('menu-description.edit')
                 ->withInput($validated)

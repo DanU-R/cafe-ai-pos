@@ -18,7 +18,7 @@ type Props = {
 export default function Login({ status, canResetPassword }: Props) {
     return (
         <>
-            <Head title="Log in" />
+            <Head title="Login | Cafe AI POS" />
 
             <Form
                 {...store.form()}
@@ -29,7 +29,9 @@ export default function Login({ status, canResetPassword }: Props) {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email" className="text-neutral-700 dark:text-neutral-200">
+                                    Email address
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -39,17 +41,20 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
+                                    className="h-11 rounded-xl shadow-sm"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password" className="text-neutral-700 dark:text-neutral-200">
+                                        Password
+                                    </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="ml-auto text-sm text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200"
                                             tabIndex={5}
                                         >
                                             Forgot password?
@@ -63,11 +68,12 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                    className="h-11 rounded-xl shadow-sm"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-3 text-neutral-600 dark:text-neutral-300">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
@@ -78,13 +84,13 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-4 h-11 w-full rounded-xl bg-amber-600 font-semibold text-white shadow-lg shadow-amber-900/20 hover:bg-amber-700"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                Masuk ke POS
                             </Button>
                         </div>
                     </>
@@ -101,6 +107,6 @@ export default function Login({ status, canResetPassword }: Props) {
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'Welcome back',
+    description: 'Sign in to manage sales, orders, inventory, and AI-powered cafe operations.',
 };

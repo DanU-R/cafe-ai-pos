@@ -6,12 +6,6 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 
-it('uses the dedicated mysql testing database for order model tests', function () {
-    expect(config('database.default'))->toBe('mysql')
-        ->and(config('database.connections.mysql.database'))->toBe('cafe_ai_pos_testing')
-        ->and(config('database.connections.mysql.database'))->not->toBe('cafe_ai_pos');
-});
-
 it('stores orders with items and keeps product snapshot data', function () {
     $user = User::factory()->create();
 

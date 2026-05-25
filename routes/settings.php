@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaymentSettingController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -24,4 +25,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user-password.update');
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
+
+    Route::middleware('admin')->group(function () {
+        Route::get('settings/payment', [PaymentSettingController::class, 'edit'])->name('settings.payment.edit');
+        Route::post('settings/payment', [PaymentSettingController::class, 'update'])->name('settings.payment.update');
+    });
 });

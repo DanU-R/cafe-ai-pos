@@ -10,12 +10,44 @@
 				"browser-logs",
 				"database-connections",
 				"database-query",
-				"database-schema",
 				"get-absolute-url",
 				"last-error",
 				"read-log-entries",
+				"application-info",
 				"search-docs",
-				"application-info"
+				"database-schema"
+			]
+		},
+		"playwright": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@playwright/mcp@latest",
+				"--browser=msedge"
+			],
+			"alwaysAllow": [
+				"browser_close",
+				"browser_resize",
+				"browser_console_messages",
+				"browser_handle_dialog",
+				"browser_evaluate",
+				"browser_file_upload",
+				"browser_drop",
+				"browser_fill_form",
+				"browser_press_key",
+				"browser_type",
+				"browser_navigate",
+				"browser_network_requests",
+				"browser_navigate_back",
+				"browser_run_code_unsafe",
+				"browser_network_request",
+				"browser_tabs",
+				"browser_select_option",
+				"browser_hover",
+				"browser_drag",
+				"browser_click",
+				"browser_snapshot",
+				"browser_take_screenshot"
 			]
 		}
 	}
